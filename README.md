@@ -1,4 +1,4 @@
-# GymApp
+# TrackGym
 
 Spor takip uygulamasi. `client` (Next.js) ve `server` (Express + Prisma) olarak iki ayri projeden olusur.
 

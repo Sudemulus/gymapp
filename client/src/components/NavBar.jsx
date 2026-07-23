@@ -19,10 +19,12 @@ export default function NavBar() {
       <nav className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
         <Link
           href="/"
-          className="flex items-center gap-2 text-lg font-semibold tracking-tight text-emerald-400"
+          className="flex items-center gap-2.5 text-lg font-extrabold tracking-tight"
         >
-          <Logo className="h-7 w-7" />
-          GymApp
+          <Logo className="h-9 w-9" />
+          <span className="text-slate-50">
+            Track<span className="text-emerald-400">Gym</span>
+          </span>
         </Link>
         <div className="flex items-center gap-4 text-sm font-medium text-slate-300">
           <Link href="/exercises" className="hover:text-emerald-400 transition-colors">

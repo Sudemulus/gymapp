@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GymApp",
+  title: "TrackGym",
   description: "Antrenman ve egzersiz takip uygulaması",
 };
 
