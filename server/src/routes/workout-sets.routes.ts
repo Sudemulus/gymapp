@@ -20,6 +20,29 @@ router.post("/", async (req, res) => {
   res.status(201).json(set);
 });
 
+router.put("/:id", async (req, res) => {
+  const id = Number(req.params.id);
+  const { weightKg, reps, completed } = req.body;
+
+  const existing = await prisma.workoutSet.findUnique({
+    where: { id },
+    include: { workout: true },
+  });
+  if (!existing || existing.workout.userId !== req.userId) {
+    return res.status(404).json({ error: "Workout set not found" });
+  }
+
+  if (weightKg === undefined || reps === undefined) {
+    return res.status(400).json({ error: "weightKg and reps are required" });
+  }
+
+  const set = await prisma.workoutSet.update({
+    where: { id },
+    data: { weightKg, reps, completed: completed ?? existing.completed },
+  });
+  res.json(set);
+});
+
 router.delete("/:id", async (req, res) => {
   const set = await prisma.workoutSet.findUnique({
     where: { id: Number(req.params.id) },

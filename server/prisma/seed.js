@@ -26,6 +26,21 @@ const exercises = [
   { name: "Tricep Pushdown", muscleGroup: "TRICEPS", description: "Kabloda triceps itisi" },
   { name: "Skull Crusher", muscleGroup: "TRICEPS", description: "Bar ile triceps ekstansiyonu" },
   { name: "Close-Grip Bench Press", muscleGroup: "TRICEPS", description: "Dar tutusla bench press" },
+
+  { name: "Plank", muscleGroup: "CORE", description: "On kollarda vucudu duz tutma hareketi" },
+  { name: "Crunch", muscleGroup: "CORE", description: "Yerde karin kasma hareketi" },
+  { name: "Russian Twist", muscleGroup: "CORE", description: "Oturarak govdeyi yanlara cevirme" },
+  { name: "Hanging Leg Raise", muscleGroup: "CORE", description: "Barda asili halde bacak kaldirma" },
+
+  { name: "Kosu (Kosu Bandi)", muscleGroup: "CARDIO", description: "Sabit hizda kosu bandinda kosu" },
+  { name: "Ip Atlama", muscleGroup: "CARDIO", description: "Iple zip hareketi" },
+  { name: "Bisiklet", muscleGroup: "CARDIO", description: "Sabit bisiklette pedal cevirme" },
+  { name: "Rower (Kurek Ergometre)", muscleGroup: "CARDIO", description: "Kurek makinesinde cekis hareketi" },
+
+  { name: "Burpee", muscleGroup: "FULL_BODY", description: "Comelme, siçrama ve sinav pozisyonunu birlestiren hareket" },
+  { name: "Kettlebell Swing", muscleGroup: "FULL_BODY", description: "Kalcadan itisle kettlebell sallama" },
+  { name: "Thruster", muscleGroup: "FULL_BODY", description: "On squat ile omuz itisini birlestiren hareket" },
+  { name: "Clean and Press", muscleGroup: "FULL_BODY", description: "Bari yerden omuza cekip yukari itme" },
 ];
 
 async function main() {

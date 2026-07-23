@@ -84,6 +84,19 @@ export function addSetToWorkout(workoutId, data) {
   });
 }
 
+export function updateWorkoutSet(setId, data) {
+  return request(`/api/workout-sets/${setId}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+export function deleteWorkoutSet(setId) {
+  return request(`/api/workout-sets/${setId}`, {
+    method: "DELETE",
+  });
+}
+
 export function getVolumeAnalytics() {
   return request("/api/analytics/volume");
 }

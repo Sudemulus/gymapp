@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { getExercises } from "@/services/api";
 import { MUSCLE_GROUPS, muscleGroupLabel } from "@/lib/muscleGroups";
+import { MUSCLE_GROUP_COLORS, OTHER_COLOR } from "@/lib/muscleGroupColors";
+import MuscleGroupIcon from "@/components/MuscleGroupIcon";
 
 export default function ExercisesPage() {
   const [activeGroup, setActiveGroup] = useState(null);
@@ -86,22 +88,35 @@ export default function ExercisesPage() {
 
         {!loading && !error && filteredExercises.length > 0 && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredExercises.map((exercise) => (
-              <div
-                key={exercise.id}
-                className="rounded-xl border border-slate-800 bg-slate-900 p-5 shadow-sm transition-colors hover:border-slate-700"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <h2 className="font-semibold text-slate-100">{exercise.name}</h2>
-                  <span className="shrink-0 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
-                    {muscleGroupLabel(exercise.muscleGroup)}
-                  </span>
+            {filteredExercises.map((exercise) => {
+              const color = MUSCLE_GROUP_COLORS[exercise.muscleGroup] ?? OTHER_COLOR;
+              return (
+                <div
+                  key={exercise.id}
+                  className="rounded-xl border border-slate-800 bg-slate-900 p-5 shadow-sm transition-colors hover:border-slate-700"
+                >
+                  <div
+                    className="flex h-16 w-16 items-center justify-center rounded-xl"
+                    style={{ backgroundColor: `${color}1a`, color }}
+                  >
+                    <MuscleGroupIcon muscleGroup={exercise.muscleGroup} className="h-9 w-9" />
+                  </div>
+
+                  <div className="mt-4 flex items-start justify-between gap-2">
+                    <h2 className="font-semibold text-slate-100">{exercise.name}</h2>
+                    <span
+                      className="shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium"
+                      style={{ backgroundColor: `${color}1a`, color }}
+                    >
+                      {muscleGroupLabel(exercise.muscleGroup)}
+                    </span>
+                  </div>
+                  {exercise.description && (
+                    <p className="mt-2 text-sm text-slate-400">{exercise.description}</p>
+                  )}
                 </div>
-                {exercise.description && (
-                  <p className="mt-2 text-sm text-slate-400">{exercise.description}</p>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

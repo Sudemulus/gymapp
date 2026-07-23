@@ -6,6 +6,8 @@ import {
   getWorkoutById,
   getExercises,
   addSetToWorkout,
+  updateWorkoutSet,
+  deleteWorkoutSet,
   getLastPerformance,
 } from "@/services/api";
 import { muscleGroupLabel } from "@/lib/muscleGroups";
@@ -32,6 +34,11 @@ export default function ActiveWorkoutPage() {
 
   const [lastPerformance, setLastPerformance] = useState(null);
   const [lastPerformanceLoading, setLastPerformanceLoading] = useState(false);
+
+  const [editingSetId, setEditingSetId] = useState(null);
+  const [editSetForm, setEditSetForm] = useState(null);
+  const [rowError, setRowError] = useState(null);
+  const [rowBusyId, setRowBusyId] = useState(null);
 
   async function loadWorkout() {
     const data = await getWorkoutById(id);
@@ -125,6 +132,59 @@ export default function ActiveWorkoutPage() {
       setFormError(err.message);
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  function startEditSet(set) {
+    setEditingSetId(set.id);
+    setEditSetForm({
+      weightKg: String(set.weightKg),
+      reps: String(set.reps),
+      completed: set.completed,
+    });
+    setRowError(null);
+  }
+
+  function cancelEditSet() {
+    setEditingSetId(null);
+    setEditSetForm(null);
+    setRowError(null);
+  }
+
+  async function saveEditSet(setId) {
+    if (editSetForm.weightKg === "" || editSetForm.reps === "") {
+      setRowError("Ağırlık ve tekrar zorunlu.");
+      return;
+    }
+
+    setRowBusyId(setId);
+    setRowError(null);
+    try {
+      await updateWorkoutSet(setId, {
+        weightKg: Number(editSetForm.weightKg),
+        reps: Number(editSetForm.reps),
+        completed: editSetForm.completed,
+      });
+      await loadWorkout();
+      cancelEditSet();
+    } catch (err) {
+      setRowError(err.message);
+    } finally {
+      setRowBusyId(null);
+    }
+  }
+
+  async function handleDeleteSet(setId) {
+    if (!window.confirm("Bu seti silmek istediğine emin misin?")) return;
+
+    setRowBusyId(setId);
+    try {
+      await deleteWorkoutSet(setId);
+      await loadWorkout();
+    } catch (err) {
+      setFormError(err.message);
+    } finally {
+      setRowBusyId(null);
     }
   }
 
@@ -256,28 +316,114 @@ export default function ActiveWorkoutPage() {
                   <th className="px-4 py-3 font-medium">Ağırlık (kg)</th>
                   <th className="px-4 py-3 font-medium">Tekrar</th>
                   <th className="px-4 py-3 font-medium">Durum</th>
+                  <th className="px-4 py-3 font-medium">İşlemler</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800 bg-slate-950">
-                {workout.sets.map((set) => (
-                  <tr key={set.id}>
-                    <td className="px-4 py-3 text-slate-300">{set.setNumber}</td>
-                    <td className="px-4 py-3 text-slate-100">{set.exercise.name}</td>
-                    <td className="px-4 py-3 text-slate-300">{set.weightKg}</td>
-                    <td className="px-4 py-3 text-slate-300">{set.reps}</td>
-                    <td className="px-4 py-3">
-                      {set.completed ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
-                          ✓ Tamamlandı
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-400">
-                          Bekliyor
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                {workout.sets.map((set) => {
+                  const isEditing = editingSetId === set.id;
+                  const isBusy = rowBusyId === set.id;
+
+                  if (isEditing) {
+                    return (
+                      <tr key={set.id} className="bg-slate-900/50">
+                        <td className="px-4 py-2 text-slate-300">{set.setNumber}</td>
+                        <td className="px-4 py-2 text-slate-100">{set.exercise.name}</td>
+                        <td className="px-4 py-2">
+                          <input
+                            type="number"
+                            step="0.5"
+                            value={editSetForm.weightKg}
+                            onChange={(e) =>
+                              setEditSetForm({ ...editSetForm, weightKg: e.target.value })
+                            }
+                            className="w-20 rounded-md border border-slate-700 bg-slate-950 px-2 py-1 text-slate-100 focus:border-emerald-500 focus:outline-none"
+                          />
+                        </td>
+                        <td className="px-4 py-2">
+                          <input
+                            type="number"
+                            value={editSetForm.reps}
+                            onChange={(e) =>
+                              setEditSetForm({ ...editSetForm, reps: e.target.value })
+                            }
+                            className="w-16 rounded-md border border-slate-700 bg-slate-950 px-2 py-1 text-slate-100 focus:border-emerald-500 focus:outline-none"
+                          />
+                        </td>
+                        <td className="px-4 py-2">
+                          <label className="flex items-center gap-1.5">
+                            <input
+                              type="checkbox"
+                              checked={editSetForm.completed}
+                              onChange={(e) =>
+                                setEditSetForm({ ...editSetForm, completed: e.target.checked })
+                              }
+                              className="h-4 w-4 rounded border-slate-600 bg-slate-950 text-emerald-500 focus:ring-emerald-500"
+                            />
+                            <span className="text-xs text-slate-400">Tamamlandı</span>
+                          </label>
+                        </td>
+                        <td className="px-4 py-2">
+                          <div className="flex flex-col gap-1">
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => saveEditSet(set.id)}
+                                disabled={isBusy}
+                                className="rounded-md bg-emerald-500 px-2.5 py-1 text-xs font-medium text-slate-950 hover:bg-emerald-400 disabled:opacity-60"
+                              >
+                                Kaydet
+                              </button>
+                              <button
+                                onClick={cancelEditSet}
+                                className="rounded-md bg-slate-800 px-2.5 py-1 text-xs font-medium text-slate-300 hover:bg-slate-700"
+                              >
+                                İptal
+                              </button>
+                            </div>
+                            {rowError && <p className="text-xs text-red-400">{rowError}</p>}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  }
+
+                  return (
+                    <tr key={set.id}>
+                      <td className="px-4 py-3 text-slate-300">{set.setNumber}</td>
+                      <td className="px-4 py-3 text-slate-100">{set.exercise.name}</td>
+                      <td className="px-4 py-3 text-slate-300">{set.weightKg}</td>
+                      <td className="px-4 py-3 text-slate-300">{set.reps}</td>
+                      <td className="px-4 py-3">
+                        {set.completed ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
+                            ✓ Tamamlandı
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-400">
+                            Bekliyor
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => startEditSet(set)}
+                            className="rounded-md bg-slate-800 px-2.5 py-1 text-xs font-medium text-slate-300 hover:bg-slate-700"
+                          >
+                            Düzenle
+                          </button>
+                          <button
+                            onClick={() => handleDeleteSet(set.id)}
+                            disabled={isBusy}
+                            className="rounded-md bg-red-500/10 px-2.5 py-1 text-xs font-medium text-red-400 hover:bg-red-500/20 disabled:opacity-60"
+                          >
+                            {isBusy ? "..." : "Sil"}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

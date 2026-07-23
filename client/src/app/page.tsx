@@ -1,8 +1,12 @@
 import Link from "next/link";
+import Logo from "@/components/Logo";
 
 export default function Home() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 py-24 text-center sm:px-6">
+      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400">
+        <Logo className="h-9 w-9" />
+      </div>
       <h1 className="text-4xl font-bold tracking-tight text-slate-50 sm:text-5xl">
         Antrenmanını takip et
       </h1>
