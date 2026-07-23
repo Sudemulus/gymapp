@@ -25,6 +25,7 @@ export default function ActiveWorkoutPage() {
   const [exerciseId, setExerciseId] = useState("");
   const [weightKg, setWeightKg] = useState("");
   const [reps, setReps] = useState("");
+  const [setCount, setSetCount] = useState("1");
   const [completed, setCompleted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState(null);
@@ -103,16 +104,22 @@ export default function ActiveWorkoutPage() {
 
     setSubmitting(true);
     try {
-      await addSetToWorkout(id, {
-        exerciseId: Number(exerciseId),
-        weightKg: Number(weightKg),
-        reps: Number(reps),
-        completed,
-      });
+      // Sets are created sequentially (not in parallel) because the backend
+      // assigns setNumber based on the current count for the workout —
+      // parallel calls would race and could assign duplicate set numbers.
+      for (let i = 0; i < Number(setCount); i++) {
+        await addSetToWorkout(id, {
+          exerciseId: Number(exerciseId),
+          weightKg: Number(weightKg),
+          reps: Number(reps),
+          completed,
+        });
+      }
       await loadWorkout();
       if (completed) restTimerRef.current?.start();
       setWeightKg("");
       setReps("");
+      setSetCount("1");
       setCompleted(false);
     } catch (err) {
       setFormError(err.message);
@@ -192,6 +199,21 @@ export default function ActiveWorkoutPage() {
           />
         </label>
 
+        <label className="flex flex-col gap-1.5">
+          <span className="text-sm font-medium text-slate-300">Set Sayısı</span>
+          <select
+            value={setCount}
+            onChange={(e) => setSetCount(e.target.value)}
+            className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none"
+          >
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+        </label>
+
         <label className="flex items-center gap-2 sm:col-span-2">
           <input
             type="checkbox"
@@ -211,7 +233,11 @@ export default function ActiveWorkoutPage() {
           disabled={submitting || exercises.length === 0}
           className="rounded-lg bg-emerald-500 px-6 py-2.5 font-medium text-slate-950 transition-colors hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60 sm:col-span-4"
         >
-          {submitting ? "Kaydediliyor..." : "Seti Kaydet"}
+          {submitting
+            ? "Kaydediliyor..."
+            : Number(setCount) > 1
+              ? `${setCount} Set Kaydet`
+              : "Seti Kaydet"}
         </button>
       </form>
 
