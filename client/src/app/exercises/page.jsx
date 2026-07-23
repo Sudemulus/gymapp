@@ -140,14 +140,14 @@ export default function ExercisesPage() {
       <p className="mt-10 text-xs text-slate-500">
         Bazı egzersiz görselleri{" "}
         <a
-          href="https://wger.de"
+          href="https://www.exercisedb.dev"
           target="_blank"
           rel="noopener noreferrer"
           className="underline hover:text-slate-400"
         >
-          wger.de
+          exercisedb.dev
         </a>{" "}
-        açık egzersiz veritabanından alınmıştır (CC BY-SA 3.0 / 4.0 ve CC0 lisansları).
+        açık egzersiz veritabanından alınmıştır.
       </p>
     </div>
   );
