@@ -12,6 +12,7 @@ export default function ExercisesPage() {
   const [exercises, setExercises] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [brokenImageIds, setBrokenImageIds] = useState(() => new Set());
 
   useEffect(() => {
     let cancelled = false;
@@ -90,17 +91,32 @@ export default function ExercisesPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filteredExercises.map((exercise) => {
               const color = MUSCLE_GROUP_COLORS[exercise.muscleGroup] ?? OTHER_COLOR;
+              const showImage = exercise.imageUrl && !brokenImageIds.has(exercise.id);
+
               return (
                 <div
                   key={exercise.id}
                   className="rounded-xl border border-slate-800 bg-slate-900 p-5 shadow-sm transition-colors hover:border-slate-700"
                 >
-                  <div
-                    className="flex h-16 w-16 items-center justify-center rounded-xl"
-                    style={{ backgroundColor: `${color}1a`, color }}
-                  >
-                    <MuscleGroupIcon muscleGroup={exercise.muscleGroup} className="h-9 w-9" />
-                  </div>
+                  {showImage ? (
+                    <div className="flex h-40 w-full items-center justify-center overflow-hidden rounded-lg bg-white p-2">
+                      <img
+                        src={exercise.imageUrl}
+                        alt={exercise.name}
+                        className="h-full w-full object-contain"
+                        onError={() =>
+                          setBrokenImageIds((prev) => new Set(prev).add(exercise.id))
+                        }
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      className="flex h-16 w-16 items-center justify-center rounded-xl"
+                      style={{ backgroundColor: `${color}1a`, color }}
+                    >
+                      <MuscleGroupIcon muscleGroup={exercise.muscleGroup} className="h-9 w-9" />
+                    </div>
+                  )}
 
                   <div className="mt-4 flex items-start justify-between gap-2">
                     <h2 className="font-semibold text-slate-100">{exercise.name}</h2>
@@ -120,6 +136,19 @@ export default function ExercisesPage() {
           </div>
         )}
       </div>
+
+      <p className="mt-10 text-xs text-slate-500">
+        Bazı egzersiz görselleri{" "}
+        <a
+          href="https://wger.de"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-slate-400"
+        >
+          wger.de
+        </a>{" "}
+        açık egzersiz veritabanından alınmıştır (CC BY-SA 3.0 / 4.0 ve CC0 lisansları).
+      </p>
     </div>
   );
 }
