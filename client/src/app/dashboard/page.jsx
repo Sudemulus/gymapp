@@ -6,6 +6,8 @@ import { useRequireAuth } from "@/lib/AuthProvider";
 import { getVolumeAnalytics, getWorkouts } from "@/services/api";
 import VolumeLineChart from "@/components/VolumeLineChart";
 import MuscleGroupDonutChart from "@/components/MuscleGroupDonutChart";
+import PageHeader from "@/components/PageHeader";
+import { LayoutDashboard } from "lucide-react";
 
 const RECENT_WORKOUTS_LIMIT = 5;
 
@@ -69,8 +71,7 @@ export default function DashboardPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-      <h1 className="text-2xl font-bold text-slate-50">Dashboard</h1>
-      <p className="mt-1 text-slate-400">Son 30 günlük ilerlemen.</p>
+      <PageHeader icon={LayoutDashboard} title="Dashboard" subtitle="Son 30 günlük ilerlemen." />
 
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-xl border border-slate-800 bg-slate-900 p-5">

@@ -13,6 +13,8 @@ import {
 import { muscleGroupLabel } from "@/lib/muscleGroups";
 import { useRequireAuth } from "@/lib/AuthProvider";
 import RestTimer from "@/components/RestTimer";
+import PageHeader from "@/components/PageHeader";
+import { Flame } from "lucide-react";
 
 export default function ActiveWorkoutPage() {
   const { id } = useParams();
@@ -198,11 +200,13 @@ export default function ActiveWorkoutPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      <h1 className="text-2xl font-bold text-slate-50">{workout.name}</h1>
-      <p className="mt-1 text-slate-400">
-        {new Date(workout.date).toLocaleDateString("tr-TR")}
-        {workout.notes ? ` · ${workout.notes}` : ""}
-      </p>
+      <PageHeader
+        icon={Flame}
+        title={workout.name}
+        subtitle={`${new Date(workout.date).toLocaleDateString("tr-TR")}${
+          workout.notes ? ` · ${workout.notes}` : ""
+        }`}
+      />
 
       <div className="mt-6">
         <RestTimer ref={restTimerRef} />

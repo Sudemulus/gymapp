@@ -10,6 +10,8 @@ import {
 } from "@/services/api";
 import WeightLineChart from "@/components/WeightLineChart";
 import BodyMeasurementsLineChart from "@/components/BodyMeasurementsLineChart";
+import PageHeader from "@/components/PageHeader";
+import { Ruler } from "lucide-react";
 
 const OPTIONAL_FIELDS = ["chest", "waist", "biceps", "thigh"];
 
@@ -180,8 +182,11 @@ export default function BodyStatsPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-      <h1 className="text-2xl font-bold text-slate-50">Ölçülerim</h1>
-      <p className="mt-1 text-slate-400">Kilo ve vücut ölçülerindeki değişimi takip et.</p>
+      <PageHeader
+        icon={Ruler}
+        title="Ölçülerim"
+        subtitle="Kilo ve vücut ölçülerindeki değişimi takip et."
+      />
 
       <form
         onSubmit={handleAddSubmit}

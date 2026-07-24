@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createWorkout } from "@/services/api";
 import { useRequireAuth } from "@/lib/AuthProvider";
+import PageHeader from "@/components/PageHeader";
+import { Flame } from "lucide-react";
 
 function today() {
   return new Date().toISOString().slice(0, 10);
@@ -42,8 +44,11 @@ export default function StartWorkoutPage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-10 sm:px-6">
-      <h1 className="text-2xl font-bold text-slate-50">Yeni Antrenman</h1>
-      <p className="mt-1 text-slate-400">Antrenman bilgilerini gir ve başlat.</p>
+      <PageHeader
+        icon={Flame}
+        title="Yeni Antrenman"
+        subtitle="Antrenman bilgilerini gir ve başlat."
+      />
 
       <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
         <label className="flex flex-col gap-1.5">

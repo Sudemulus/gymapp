@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/AuthProvider";
+import PageHeader from "@/components/PageHeader";
+import { LogIn } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -30,13 +32,18 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-10 sm:px-6">
-      <h1 className="text-2xl font-bold text-slate-50">Giriş Yap</h1>
-      <p className="mt-1 text-slate-400">
-        Hesabın yok mu?{" "}
-        <Link href="/register" className="text-emerald-400 hover:underline">
-          Kayıt ol
-        </Link>
-      </p>
+      <PageHeader
+        icon={LogIn}
+        title="Giriş Yap"
+        subtitle={
+          <>
+            Hesabın yok mu?{" "}
+            <Link href="/register" className="text-emerald-400 hover:underline">
+              Kayıt ol
+            </Link>
+          </>
+        }
+      />
 
       <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
         <label className="flex flex-col gap-1.5">

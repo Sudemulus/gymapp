@@ -5,6 +5,9 @@ import { getExercises } from "@/services/api";
 import { MUSCLE_GROUPS, muscleGroupLabel } from "@/lib/muscleGroups";
 import { MUSCLE_GROUP_COLORS, OTHER_COLOR } from "@/lib/muscleGroupColors";
 import MuscleGroupIcon from "@/components/MuscleGroupIcon";
+import HoverPlayGif from "@/components/HoverPlayGif";
+import PageHeader from "@/components/PageHeader";
+import { Dumbbell } from "lucide-react";
 
 export default function ExercisesPage() {
   const [activeGroup, setActiveGroup] = useState(null);
@@ -43,8 +46,11 @@ export default function ExercisesPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-      <h1 className="text-2xl font-bold text-slate-50">Egzersiz Kütüphanesi</h1>
-      <p className="mt-1 text-slate-400">Kas grubuna göre filtrele veya isimle ara.</p>
+      <PageHeader
+        icon={Dumbbell}
+        title="Egzersiz Kütüphanesi"
+        subtitle="Kas grubuna göre filtrele veya isimle ara."
+      />
 
       <input
         type="text"
@@ -99,11 +105,11 @@ export default function ExercisesPage() {
                   className="rounded-xl border border-slate-800 bg-slate-900 p-5 shadow-sm transition-colors hover:border-slate-700"
                 >
                   {showImage ? (
-                    <div className="flex h-40 w-full items-center justify-center overflow-hidden rounded-lg bg-white p-2">
-                      <img
+                    <div className="h-40 w-full overflow-hidden rounded-lg bg-white p-2">
+                      <HoverPlayGif
                         src={exercise.imageUrl}
                         alt={exercise.name}
-                        className="h-full w-full object-contain"
+                        className="h-full w-full"
                         onError={() =>
                           setBrokenImageIds((prev) => new Set(prev).add(exercise.id))
                         }
