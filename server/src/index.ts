@@ -7,6 +7,7 @@ import workoutsRoutes from "./routes/workouts.routes";
 import workoutSetsRoutes from "./routes/workout-sets.routes";
 import analyticsRoutes from "./routes/analytics.routes";
 import bodyStatsRoutes from "./routes/body-stats.routes";
+import { prisma } from "./lib/prisma";
 
 dotenv.config();
 
@@ -24,6 +25,30 @@ app.use(
 app.use(express.json());
 
 app.get("/health", (_req, res) => res.json({ status: "ok" }));
+
+// TEMPORARY one-off fix, remove after running once against production.
+app.get("/api/admin/fix-exercises", async (req, res) => {
+  if (req.query.key !== process.env.JWT_SECRET) {
+    res.status(403).json({ error: "forbidden" });
+    return;
+  }
+
+  const swing = await prisma.exercise.updateMany({
+    where: { name: "Kettlebell Swing" },
+    data: { imageUrl: "https://static.exercisedb.dev/media/UHJlbu3.gif" },
+  });
+
+  const rower = await prisma.exercise.updateMany({
+    where: { name: "Rower (Kurek Ergometre)" },
+    data: {
+      name: "Eliptik Bisiklet (Cross Trainer)",
+      description: "Eliptik bisiklette kol ve bacak koordinasyonuyla yuruyus hareketi",
+      imageUrl: "https://static.exercisedb.dev/media/rjtuP6X.gif",
+    },
+  });
+
+  res.json({ swingUpdated: swing.count, rowerUpdated: rower.count });
+});
 
 app.use("/api/users", usersRoutes);
 app.use("/api/exercises", exercisesRoutes);
