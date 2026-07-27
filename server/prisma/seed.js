@@ -163,10 +163,10 @@ const exercises = [
     imageUrl: "https://static.exercisedb.dev/media/H1PESYI.gif",
   },
   {
-    name: "Rower (Kurek Ergometre)",
+    name: "Eliptik Bisiklet (Cross Trainer)",
     muscleGroup: "CARDIO",
-    description: "Kurek makinesinde cekis hareketi",
-    imageUrl: null,
+    description: "Eliptik bisiklette kol ve bacak koordinasyonuyla yuruyus hareketi",
+    imageUrl: "https://static.exercisedb.dev/media/rjtuP6X.gif",
   },
 
   {
@@ -179,7 +179,7 @@ const exercises = [
     name: "Kettlebell Swing",
     muscleGroup: "FULL_BODY",
     description: "Kalcadan itisle kettlebell sallama",
-    imageUrl: null,
+    imageUrl: "https://static.exercisedb.dev/media/UHJlbu3.gif",
   },
   {
     name: "Thruster",
@@ -203,6 +203,14 @@ async function main() {
       create: exercise,
     });
   }
+
+  try {
+    await prisma.exercise.delete({ where: { name: "Rower (Kurek Ergometre)" } });
+    console.log("Rower (Kurek Ergometre) silindi.");
+  } catch {
+    // Kayit yoksa veya bir antrenmanda kullanildiysa (onDelete: Restrict) sessizce atla.
+  }
+
   console.log(`Seed tamamlandi: ${exercises.length} egzersiz eklendi/guncellendi.`);
 }
 
