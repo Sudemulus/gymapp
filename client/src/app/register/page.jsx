@@ -24,7 +24,7 @@ export default function RegisterPage() {
 
     try {
       await register(name, email, password);
-      router.push("/workout");
+      router.push("/");
     } catch (err) {
       setError(err.message);
       setSubmitting(false);

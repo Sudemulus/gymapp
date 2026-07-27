@@ -23,7 +23,7 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      router.push("/workout");
+      router.push("/");
     } catch (err) {
       setError(err.message);
       setSubmitting(false);
