@@ -33,6 +33,36 @@ export async function createWorkout(req: Request, res: Response) {
   res.status(201).json(workout);
 }
 
+export async function repeatWorkout(req: Request, res: Response) {
+  const sourceWorkout = await prisma.workout.findUnique({
+    where: { id: Number(req.params.id) },
+    include: { sets: { orderBy: { setNumber: "asc" } } },
+  });
+  if (!sourceWorkout || sourceWorkout.userId !== req.userId) {
+    return res.status(404).json({ error: "Workout not found" });
+  }
+
+  const workout = await prisma.workout.create({
+    data: {
+      userId: req.userId as number,
+      name: sourceWorkout.name,
+      date: new Date(),
+      sets: {
+        create: sourceWorkout.sets.map((set) => ({
+          exerciseId: set.exerciseId,
+          setNumber: set.setNumber,
+          weightKg: set.weightKg,
+          reps: set.reps,
+          completed: false,
+        })),
+      },
+    },
+    include: { sets: { include: { exercise: true } } },
+  });
+
+  res.status(201).json(workout);
+}
+
 export async function addSetToWorkout(req: Request, res: Response) {
   const workoutId = Number(req.params.id);
   const { exerciseId, weightKg, reps, completed } = req.body;

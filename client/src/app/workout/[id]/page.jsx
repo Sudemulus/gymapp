@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   getWorkoutById,
   getExercises,
@@ -9,17 +9,21 @@ import {
   updateWorkoutSet,
   deleteWorkoutSet,
   getLastPerformance,
+  repeatWorkout,
 } from "@/services/api";
 import { muscleGroupLabel } from "@/lib/muscleGroups";
 import { useRequireAuth } from "@/lib/AuthProvider";
 import RestTimer from "@/components/RestTimer";
 import PageHeader from "@/components/PageHeader";
-import { Flame } from "lucide-react";
+import { Flame, Repeat } from "lucide-react";
 
 export default function ActiveWorkoutPage() {
   const { id } = useParams();
+  const router = useRouter();
   const { user, loading: authLoading } = useRequireAuth();
   const restTimerRef = useRef(null);
+  const [repeating, setRepeating] = useState(false);
+  const [repeatError, setRepeatError] = useState(null);
 
   const [workout, setWorkout] = useState(null);
   const [exercises, setExercises] = useState([]);
@@ -199,6 +203,18 @@ export default function ActiveWorkoutPage() {
     }
   }
 
+  async function handleRepeatWorkout() {
+    setRepeating(true);
+    setRepeatError(null);
+    try {
+      const newWorkout = await repeatWorkout(id);
+      router.push(`/workout/${newWorkout.id}`);
+    } catch (err) {
+      setRepeatError(err.message);
+      setRepeating(false);
+    }
+  }
+
   if (loading) {
     return <p className="px-4 py-10 text-center text-slate-400">Yükleniyor...</p>;
   }
@@ -209,13 +225,28 @@ export default function ActiveWorkoutPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      <PageHeader
-        icon={Flame}
-        title={workout.name}
-        subtitle={`${new Date(workout.date).toLocaleDateString("tr-TR")}${
-          workout.notes ? ` · ${workout.notes}` : ""
-        }`}
-      />
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <PageHeader
+          icon={Flame}
+          title={workout.name}
+          subtitle={`${new Date(workout.date).toLocaleDateString("tr-TR")}${
+            workout.notes ? ` · ${workout.notes}` : ""
+          }`}
+        />
+
+        {workout.sets.length > 0 && (
+          <button
+            onClick={handleRepeatWorkout}
+            disabled={repeating}
+            className="flex shrink-0 items-center gap-1.5 rounded-lg border border-slate-700 px-3.5 py-2 text-sm font-medium text-slate-300 transition-colors hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <Repeat className="h-4 w-4" strokeWidth={2.25} />
+            {repeating ? "Oluşturuluyor..." : "Bu Antrenmanı Tekrarla"}
+          </button>
+        )}
+      </div>
+
+      {repeatError && <p className="mt-2 text-sm text-red-400">Hata: {repeatError}</p>}
 
       <div className="mt-6">
         <RestTimer ref={restTimerRef} />

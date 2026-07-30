@@ -112,6 +112,12 @@ export function addSetToWorkout(workoutId, data) {
   });
 }
 
+export function repeatWorkout(workoutId) {
+  return request(`/api/workouts/${workoutId}/repeat`, {
+    method: "POST",
+  });
+}
+
 export function updateWorkoutSet(setId, data) {
   return request(`/api/workout-sets/${setId}`, {
     method: "PUT",
