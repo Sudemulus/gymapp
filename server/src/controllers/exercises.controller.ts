@@ -31,14 +31,29 @@ export async function getLastPerformance(req: Request, res: Response) {
   const exercise = await prisma.exercise.findUnique({ where: { id: exerciseId } });
   if (!exercise) return res.status(404).json({ error: "Exercise not found" });
 
-  const lastCompletedSet = await prisma.workoutSet.findFirst({
-    where: { exerciseId, completed: true, workout: { userId: req.userId } },
-    orderBy: [{ workout: { date: "desc" } }, { createdAt: "desc" }],
-    select: { workoutId: true },
-  });
+  const [lastCompletedSet, personalRecordSet] = await Promise.all([
+    prisma.workoutSet.findFirst({
+      where: { exerciseId, completed: true, workout: { userId: req.userId } },
+      orderBy: [{ workout: { date: "desc" } }, { createdAt: "desc" }],
+      select: { workoutId: true },
+    }),
+    prisma.workoutSet.findFirst({
+      where: { exerciseId, completed: true, workout: { userId: req.userId } },
+      orderBy: [{ weightKg: "desc" }, { reps: "desc" }],
+      select: { weightKg: true, reps: true, workout: { select: { date: true } } },
+    }),
+  ]);
+
+  const personalRecord = personalRecordSet
+    ? {
+        weightKg: personalRecordSet.weightKg,
+        reps: personalRecordSet.reps,
+        date: personalRecordSet.workout.date,
+      }
+    : null;
 
   if (!lastCompletedSet) {
-    return res.json({ workoutId: null, date: null, sets: [] });
+    return res.json({ workoutId: null, date: null, sets: [], personalRecord });
   }
 
   const [workout, sets] = await Promise.all([
@@ -53,7 +68,12 @@ export async function getLastPerformance(req: Request, res: Response) {
     }),
   ]);
 
-  res.json({ workoutId: lastCompletedSet.workoutId, date: workout?.date ?? null, sets });
+  res.json({
+    workoutId: lastCompletedSet.workoutId,
+    date: workout?.date ?? null,
+    sets,
+    personalRecord,
+  });
 }
 
 export async function createExercise(req: Request, res: Response) {

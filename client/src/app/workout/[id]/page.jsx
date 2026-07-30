@@ -36,6 +36,7 @@ export default function ActiveWorkoutPage() {
 
   const [lastPerformance, setLastPerformance] = useState(null);
   const [lastPerformanceLoading, setLastPerformanceLoading] = useState(false);
+  const [newRecord, setNewRecord] = useState(null);
 
   const [editingSetId, setEditingSetId] = useState(null);
   const [editSetForm, setEditSetForm] = useState(null);
@@ -85,6 +86,7 @@ export default function ActiveWorkoutPage() {
 
     async function loadLastPerformance() {
       setLastPerformanceLoading(true);
+      setNewRecord(null);
       try {
         const data = await getLastPerformance(exerciseId);
         if (!cancelled) setLastPerformance(data);
@@ -111,6 +113,10 @@ export default function ActiveWorkoutPage() {
       return;
     }
 
+    const priorRecordWeight = lastPerformance?.personalRecord?.weightKg ?? null;
+    const isNewRecord =
+      completed && (priorRecordWeight === null || Number(weightKg) > Number(priorRecordWeight));
+
     setSubmitting(true);
     try {
       // Sets are created sequentially (not in parallel) because the backend
@@ -125,6 +131,9 @@ export default function ActiveWorkoutPage() {
         });
       }
       await loadWorkout();
+      const refreshed = await getLastPerformance(exerciseId);
+      setLastPerformance(refreshed);
+      setNewRecord(isNewRecord ? { weightKg: Number(weightKg), reps: Number(reps) } : null);
       if (completed) restTimerRef.current?.start();
       setWeightKg("");
       setReps("");
@@ -237,6 +246,20 @@ export default function ActiveWorkoutPage() {
             {lastPerformance.sets
               .map((s) => `${s.weightKg} kg × ${s.reps} tekrar`)
               .join(", ")}
+          </div>
+        )}
+
+        {!lastPerformanceLoading && lastPerformance?.personalRecord && (
+          <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-sm text-amber-300 sm:col-span-2 sm:self-end">
+            <span className="font-medium">🏆 Kişisel Rekorun: </span>
+            {lastPerformance.personalRecord.weightKg} kg × {lastPerformance.personalRecord.reps}{" "}
+            tekrar
+          </div>
+        )}
+
+        {newRecord && (
+          <div className="rounded-lg border border-amber-500/40 bg-amber-500/15 px-4 py-2.5 text-sm font-medium text-amber-300 sm:col-span-4">
+            🏆 Yeni Rekor! {newRecord.weightKg} kg × {newRecord.reps} tekrar
           </div>
         )}
 
