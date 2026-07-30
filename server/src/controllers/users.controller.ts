@@ -84,6 +84,10 @@ export async function forgotPassword(req: Request, res: Response) {
         },
       });
 
+      if (process.env.NODE_ENV !== "production") {
+        console.log(`[dev] password reset code for ${user.email}: ${code}`);
+      }
+
       try {
         await sendPasswordResetEmail(user.email, code);
       } catch (err) {
