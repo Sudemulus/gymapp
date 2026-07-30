@@ -68,6 +68,12 @@ export default function LoginPage() {
           />
         </label>
 
+        <div className="flex justify-end">
+          <Link href="/forgot-password" className="text-sm text-emerald-400 hover:underline">
+            Şifremi unuttum?
+          </Link>
+        </div>
+
         {error && <p className="text-sm text-red-400">Hata: {error}</p>}
 
         <button

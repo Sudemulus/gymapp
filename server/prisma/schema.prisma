@@ -30,6 +30,11 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
+  resetCodeHash     String?   @map("reset_code_hash") @db.VarChar(255)
+  resetCodeExpires  DateTime? @map("reset_code_expires_at")
+  resetCodeAttempts Int       @default(0) @map("reset_code_attempts")
+  resetRequestedAt  DateTime? @map("reset_requested_at")
+
   workouts         Workout[]
   bodyMeasurements BodyMeasurement[]
 

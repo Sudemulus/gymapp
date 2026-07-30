@@ -42,6 +42,20 @@ export function getMe() {
   return request("/api/users/me");
 }
 
+export function forgotPassword(data) {
+  return request("/api/users/forgot-password", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function resetPassword(data) {
+  return request("/api/users/reset-password", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
 export function getExercises(muscleGroup) {
   const query = muscleGroup ? `?muscleGroup=${encodeURIComponent(muscleGroup)}` : "";
   return request(`/api/exercises${query}`);
