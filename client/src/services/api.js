@@ -42,6 +42,20 @@ export function getMe() {
   return request("/api/users/me");
 }
 
+export function updateProfile(data) {
+  return request("/api/users/me", {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export function changePassword(data) {
+  return request("/api/users/password", {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
 export function forgotPassword(data) {
   return request("/api/users/forgot-password", {
     method: "POST",

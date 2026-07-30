@@ -57,6 +57,50 @@ export async function me(req: Request, res: Response) {
   res.json(user);
 }
 
+export async function updateProfile(req: Request, res: Response) {
+  const { name, email } = req.body;
+  if (!name || !email) {
+    return res.status(400).json({ error: "name and email are required" });
+  }
+
+  try {
+    const user = await prisma.user.update({
+      where: { id: req.userId },
+      data: { name, email },
+      select: { id: true, name: true, email: true },
+    });
+    res.json(user);
+  } catch (err: any) {
+    if (err.code === "P2002") {
+      return res.status(409).json({ error: "A user with this email already exists" });
+    }
+    throw err;
+  }
+}
+
+export async function changePassword(req: Request, res: Response) {
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: "currentPassword and newPassword are required" });
+  }
+  if (newPassword.length < 6) {
+    return res.status(400).json({ error: "newPassword must be at least 6 characters" });
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: req.userId } });
+  if (!user || !(await bcrypt.compare(currentPassword, user.passwordHash))) {
+    return res.status(401).json({ error: "Mevcut şifre yanlış." });
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { passwordHash },
+  });
+
+  res.json({ message: "Şifreniz başarıyla güncellendi." });
+}
+
 export async function forgotPassword(req: Request, res: Response) {
   const { email } = req.body;
   if (!email) {

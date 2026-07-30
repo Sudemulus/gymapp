@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Dumbbell, Flame, LayoutDashboard, Ruler, LogIn, LogOut } from "lucide-react";
+import { Dumbbell, Flame, LayoutDashboard, Ruler, LogIn, LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/lib/AuthProvider";
 import Logo from "@/components/Logo";
 
@@ -56,12 +56,20 @@ export default function NavBar() {
 
           {!loading && user && (
             <div className="ml-2 flex items-center gap-3 border-l border-slate-800 pl-3">
-              <div className="hidden items-center gap-2 md:flex">
+              <Link
+                href="/settings"
+                className={`hidden items-center gap-2 rounded-lg px-2 py-1.5 transition-colors md:flex ${
+                  pathname === "/settings"
+                    ? "bg-emerald-500/10 text-emerald-400"
+                    : "text-slate-300 hover:bg-slate-800/60 hover:text-slate-50"
+                }`}
+              >
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 text-xs font-bold text-slate-950">
                   {user.name?.charAt(0).toUpperCase()}
                 </div>
-                <span className="text-slate-300">{user.name}</span>
-              </div>
+                <span>{user.name}</span>
+                <Settings className="h-3.5 w-3.5" strokeWidth={2.25} />
+              </Link>
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-1.5 rounded-lg border border-slate-700 px-3 py-2 text-slate-300 transition-colors hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-400"
